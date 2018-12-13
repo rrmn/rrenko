@@ -230,19 +230,21 @@ renko_data <- function(data){
   return(data)
 }
 
-renko <- function(data){
+renko <- function(data, x, y, size = 10){
 
-  data <- renko_data(data)
+  data <- renko_data(data, x, y, size)
 
   require(ggplot2)
-  ggplot(data[date < "2014-10-01"]) +
-    # some bugs because of how ggplot handles the order of step / rleid
+  ggplot(data) +
+    # some bugs because of how ggplot handles the order of step / rleid should be fixed
     geom_col(aes(x = interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
                  y = base,
                  fill = paste(direction, base != size))) +
     scale_fill_manual(values = c("#F8766D", "transparent", "#00BFC4", "transparent")) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1),
-          legend.position = "none")
-
+          legend.position = "none") +
+    geom_point(aes(x = interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
+                   y = close)) +
+    scale_x_discrete(labels = c(data$date))
 }
 
