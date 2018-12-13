@@ -4,7 +4,7 @@ renko <- function(data, size = 10, style = "modern", points = FALSE){
   require(ggplot2)
 
   # do the data stuff
-  data <- renko_data(data, size)
+  data <- renko_transform_data(data, size)
 
   # plot the plot
   g <- ggplot(data) +
