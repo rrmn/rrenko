@@ -1,7 +1,7 @@
 Package: rrenko
 Type: Package
 Title: An R Package for Renko Charts
-Version: 0.1.1
+Version: 0.1.2
 Author: Roman Abashin
 Maintainer: Roman Abashin <mail@romanabashin.com>
 Description: An R package to efficiently build Renko charts with ggplot2 and data.table. Renko charts are used to filter the noise in volatile stock movements. 

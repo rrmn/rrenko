@@ -2,6 +2,8 @@ renko_transform_data <- function(data, size){
 
   require(data.table)
 
+  setDT(data)
+
   # add corridor and rleid
   data <- renko_add_corridor(data, size)
 
