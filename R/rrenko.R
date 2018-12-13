@@ -8,7 +8,7 @@ size <- 5
 
 
 
-renko_check <- function(data){
+renko_check <- function(data, size){
 
   j <- 1
 
@@ -111,10 +111,10 @@ renko_check <- function(data){
 
 
 
-renko_transform <- function(data){
+renko_transform <- function(data, y, size){
 
   # add corridor
-  setDT(data)[, corridor_bottom := size * floor(close / size)]
+  setDT(data)[, corridor_bottom := size * floor(y / size)]
   data[, corridor_top := corridor_bottom + size]
 
   # add sequence group by corridor
@@ -134,7 +134,7 @@ remove_noise <- function(data){
 }
 
 
-renko_fill <- function(data){
+renko_fill <- function(data, x, y, size){
 
   # set key to prevent duplicated cols in filling
   setkey(data, rleid, base)
@@ -142,12 +142,12 @@ renko_fill <- function(data){
   # add base lag
   # dont break this up in lines
   ### still needs a catch for first row
-  data[, base_lag := data[!.BY, on=.(rleid)][.(.SD$date - 1), on=.(date), roll=TRUE, x.base], by=rleid]
+  data[, base_lag := data[!.BY, on=.(rleid)][.(.SD$x - 1), on=.(x), roll=TRUE, x.base], by=rleid]
 
   # add direction lag
   # dont break this up in lines
   ### still needs a catch for first row
-  data[, direction_lag := data[!.BY, on=.(rleid)][.(.SD$date - 1), on=.(date), roll=TRUE, x.direction], by=rleid]
+  data[, direction_lag := data[!.BY, on=.(rleid)][.(.SD$x - 1), on=.(x), roll=TRUE, x.direction], by=rleid]
 
   # start with first row
   result <- data[rleid == 1]
@@ -156,7 +156,7 @@ renko_fill <- function(data){
   if(nrow(data[direction == "up" & direction_lag == "up" & base >= base_lag + size]) > 0){
     data_up_up <- data[direction == "up" & direction_lag == "up" & base >= base_lag + size,
                       .(base = seq(base_lag + size, base, by = size)),
-                      by = list(rleid, date, close, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
+                      by = list(rleid, x, y, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
     setkey(data_up_up, NULL)
     result <- rbindlist(list(result, data_up_up), use.names = TRUE)
   }
@@ -165,7 +165,7 @@ renko_fill <- function(data){
   if(nrow(data[direction == "down" & direction_lag == "up" & base <= base_lag - size]) > 0){
     data_up_down <- data[direction == "down" & direction_lag == "up" & base <= base_lag - size,
                     .(base = seq(base_lag - size, base, by = -size)),
-                    by = list(rleid, date, close, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
+                    by = list(rleid, x, y, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
     setkey(data_up_down, NULL)
     result <- rbindlist(list(result, data_up_down), use.names = TRUE)
   }
@@ -174,7 +174,7 @@ renko_fill <- function(data){
   if(nrow(data[direction == "up" & direction_lag == "down" & base >= base_lag + size]) > 0){
     data_down_up <- data[direction == "up" & direction_lag == "down" & base >= base_lag + size,
                        .(base = seq(base_lag + size, base, by = size)),
-                       by = list(rleid, date, close, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
+                       by = list(rleid, x, y, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
     setkey(data_down_up, NULL)
     result <- rbindlist(list(result, data_down_up), use.names = TRUE)
   }
@@ -183,7 +183,7 @@ renko_fill <- function(data){
   if(nrow(data[direction == "down" & direction_lag == "down" & base <= base_lag - size]) > 0) {
       data_down_down <- data[direction == "down" & direction_lag == "down" & base <= base_lag - size,
                          .(base = seq(base_lag - size, base, by = -size)),
-                         by = list(rleid, date, close, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
+                         by = list(rleid, x, y, direction, base_lag, direction_lag, corridor_bottom, corridor_top)]
       setkey(data_down_down, NULL)
       result <- rbindlist(list(result, data_down_down), use.names = TRUE)
   }
@@ -209,13 +209,13 @@ renko_add_bricks <- function(data){
 
 
 
-renko_data <- function(data){
+renko_data <- function(data, x, y, size){
 
   # transform data
-  data <- renko_transform(data)
+  data <- renko_transform(data, y, size)
 
   # start sequence
-  data <- renko_check(data)
+  data <- renko_check(data, size)
 
   # remove noise
   data <- remove_noise(data)
@@ -230,21 +230,40 @@ renko_data <- function(data){
   return(data)
 }
 
-renko <- function(data, x, y, size = 10){
+renko <- function(data, x, y, size = 10, style = "modern", points = FALSE){
 
+  # do the data stuff
   data <- renko_data(data, x, y, size)
 
+
   require(ggplot2)
-  ggplot(data) +
+
+  # plot the plot
+  g <- ggplot(data) +
     # some bugs because of how ggplot handles the order of step / rleid should be fixed
-    geom_col(aes(x = interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
-                 y = base,
-                 fill = paste(direction, base != size))) +
-    scale_fill_manual(values = c("#F8766D", "transparent", "#00BFC4", "transparent")) +
+    geom_col(aes(interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
+                 base,
+                 fill = paste(direction, base != size),
+                 color = paste(direction, base != size)))
+
+  if(style == "modern"){
+    g <- g + scale_fill_manual(values = c("#F8766D", "transparent", "#00BFC4", "transparent")) +
+      scale_color_manual(values = c("#F8766D", "transparent", "#00BFC4", "transparent"))
+  } else if(style == "classic"){
+    g <- g + scale_fill_manual(values = c("#000000", "transparent", "#FFFFFF", "transparent")) +
+      scale_color_manual(values = c("#000000", "transparent", "#000000", "transparent"))
+  } else {
+    stop("Unrecognized style.")
+  }
+
     theme(axis.text.x = element_text(angle = 90, hjust = 1),
           legend.position = "none") +
+    scale_x_discrete(labels = c(data$x))
+
     geom_point(aes(x = interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
-                   y = close)) +
-    scale_x_discrete(labels = c(data$date))
+                   y = close))
+
+  return(g)
+
 }
 
