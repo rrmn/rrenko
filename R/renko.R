@@ -1,4 +1,4 @@
-renko <- function(data, size = 10, style = "modern", points = FALSE){
+renko <- function(data, size, style = "modern", points = FALSE){
 
   require(data.table)
   require(ggplot2)
@@ -32,8 +32,10 @@ renko <- function(data, size = 10, style = "modern", points = FALSE){
   }
 
 
-    geom_point(aes(x = interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
-                   y = close))
+  if(points == TRUE){
+    g <- g + geom_point(aes(x = interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
+                          y = close))
+  }
 
   return(g)
 
