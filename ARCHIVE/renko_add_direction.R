@@ -1,4 +1,4 @@
-renko_add_direction <- function(data, size = 10){
+renko_add_direction <- function(data, size){
 
   require(data.table)
 
