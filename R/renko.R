@@ -3,8 +3,6 @@ renko <- function(data, size = 10, style = "modern", points = FALSE){
   require(data.table)
   require(ggplot2)
 
-  setDT(data)
-
   # do the data stuff
   data <- renko_transform_data(data, size)
 
