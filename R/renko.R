@@ -3,29 +3,6 @@ renko <- function(data, size, style = "modern", points = FALSE){
   require(data.table)
   require(ggplot2)
 
-  renko_transform_data <- function(data, size){
-
-    require(data.table)
-
-    # add corridor and rleid
-    data <- renko_add_corridor(data, size)
-
-    # add directions and brick base
-    data <- renko_add_direction(data, size)
-
-    # remove noise
-    data <- renko_remove_noise(data)
-
-    # fill gaps
-    data <- renko_fill_gaps(data, size)
-
-    # add bricks
-    data <- renko_add_bricks(data, size)
-
-    # return result
-    return(data)
-  }
-
 
     ### ADD CORRIDOR
 
