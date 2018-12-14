@@ -44,14 +44,17 @@ rrenko is an R package to efficiently build Renko charts with the help of ggplot
 
 
 ## Changelog
-### 0.1.3 - Initial Commit
-2018-12-13
+### 0.2.0 - 2018-12-15
+* Added variable `points = TRUE` that adds the last close of one date as a geom_point
+* Bug fixed where data table was not recognized
+* Removed modularization due to bugs
+
+### 0.1.3 - 2018-12-13
 * Works in most cases except really and really small sizes.
 * x-axis labels get repeated. This will get fixed at some point.
 * `renko()` funtion expects specific variables names at the moment.
 
-### 0.1.0 - Initial Commit
-2018-12-13
+### 0.1.0 - 2018-12-13
 * Still unstable.
 * Lots of bugs.
 * For experimental use only.
