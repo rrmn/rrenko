@@ -3,6 +3,8 @@ renko <- function(data, size = 10, style = "modern", points = FALSE){
   require(data.table)
   require(ggplot2)
 
+  setDT(data)
+
   # do the data stuff
   data <- renko_transform_data(data, size)
 
@@ -12,7 +14,11 @@ renko <- function(data, size = 10, style = "modern", points = FALSE){
     geom_col(aes(interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
                  base,
                  fill = paste(direction, base != size),
-                 color = paste(direction, base != size)))
+                 color = paste(direction, base != size))) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          legend.position = "none") +
+    scale_x_discrete(labels = c(data$date))
+
 
   if(style == "modern"){
     g <- g + scale_fill_manual(values = c("#F8766D", "transparent", "#00BFC4", "transparent")) +
@@ -24,9 +30,6 @@ renko <- function(data, size = 10, style = "modern", points = FALSE){
     stop("Unrecognized style. Maybe try style = \"modern\" or \"classic\"?")
   }
 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1),
-          legend.position = "none") +
-    scale_x_discrete(labels = c(data$x))
 
     geom_point(aes(x = interaction(paste(format(rleid, digits = nchar(max(rleid))), step)),
                    y = close))

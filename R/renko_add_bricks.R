@@ -1,4 +1,4 @@
-renko_add_bricks <- function(data){
+renko_add_bricks <- function(data, size){
 
   require(data.table)
 
