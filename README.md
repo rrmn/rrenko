@@ -45,10 +45,12 @@ rrenko is an R package to efficiently build Renko charts with the help of ggplot
 ## Changelog
 ### 0.1.3 - Initial Commit
 2018-12-13
-* Works
+* Works in most cases except really and really small sizes.
+* x-axis labels get repeated. This will get fixed at some point.
+* `renko()` funtion expects specific variables names at the moment.
 
 ### 0.1.0 - Initial Commit
 2018-12-13
-* Still unstable
-* Lots of bugs
-* For experimental use only
+* Still unstable.
+* Lots of bugs.
+* For experimental use only.
