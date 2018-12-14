@@ -1,11 +1,11 @@
 renko <- function(data, size, style = "modern", points = FALSE){
 
-  require(data.table)
-  require(ggplot2)
+    if(!is.data.table(data)){
+      stop("Please use a data.table as input for `data =`.")
+    }
 
 
     ### ADD CORRIDOR
-
     # add corridor
     data[, corridor_bottom := size * floor(close / size)]
     data[, corridor_top := corridor_bottom + size]
@@ -221,7 +221,5 @@ renko <- function(data, size, style = "modern", points = FALSE){
   }
 
   return(g)
-
-
 }
 
