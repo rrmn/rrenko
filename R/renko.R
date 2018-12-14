@@ -27,9 +27,7 @@ renko <- function(data, size, style = "modern", points = FALSE){
   }
 
 
-  renko_add_corridor <- function(data, size){
-
-    require(data.table)
+    ### ADD CORRIDOR
 
     # add corridor
     data[, corridor_bottom := size * floor(close / size)]
@@ -38,13 +36,8 @@ renko <- function(data, size, style = "modern", points = FALSE){
     # add sequence group by corridor
     data <- data[, head(.SD, 1), by=.(corridor_bottom, rleid(corridor_bottom))]
 
-    return(data)
 
-  }
-
-  renko_add_direction <- function(data, size){
-
-    require(data.table)
+    ### ADD DIRECTION
 
     # initialize counter
     j <- 1
@@ -141,20 +134,15 @@ renko <- function(data, size, style = "modern", points = FALSE){
         #print(paste("5- Row", i, "without match with j =", j))
       }
     }
-    return(data)
-  }
 
-  renko_remove_noise <- function(data){
+
+    ### REMOVE NOISE
 
     # remove noise
     data <- data[!is.na(direction)]
 
-    return(data)
-  }
 
-  renko_fill_gaps <- function(data, size){
-
-    require(data.table)
+    ### FILL GAPS
 
     # set key to prevent duplicated cols in filling
     setkey(data, rleid, base)
@@ -212,13 +200,10 @@ renko <- function(data, size, style = "modern", points = FALSE){
 
     # reset key in original table
     #setkey(data, NULL)
+    data <- result
 
-    return(result)
-  }
 
-  renko_add_bricks <- function(data, size){
-
-    require(data.table)
+  ### ADD BRICKS
 
     data[, step := 1:.N]
 
@@ -226,17 +211,9 @@ renko <- function(data, size, style = "modern", points = FALSE){
     data2[, base := size]
     data <- rbindlist(list(data, data2))
 
-    return(data)
-  }
 
 
 
-
-  # transform to data.table
-  setDT(data)
-
-  # do the data stuff
-  data <- renko_transform_data(data, size)
 
   # plot the plot
   g <- ggplot(data) +
