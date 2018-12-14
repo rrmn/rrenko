@@ -29,6 +29,7 @@ rrenko is an R package to efficiently build Renko charts with the help of ggplot
 ### Code
 
     devtools::install_github("RomanAbashin/rrenko")
+    library(renko)
 
     renko(df, 5, style = "modern") + 
         labs(title = "Renko chart with R", x = "", y = "")
