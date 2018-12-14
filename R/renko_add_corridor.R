@@ -2,8 +2,6 @@ renko_add_corridor <- function(data, size){
 
   require(data.table)
 
-  setDT(data)
-
   # add corridor
   data[, corridor_bottom := size * floor(close / size)]
   data[, corridor_top := corridor_bottom + size]
