@@ -1,7 +1,7 @@
 # rrenko
 
 ## About
-rrenko is an R package to efficiently build Renko charts with the help of ggplot2 and data.table. Renko charts are used to filter the signal from the noise in volatile stock movements. 
+rrenko is an in-development R package to efficiently build Renko charts with the help of ggplot2 and data.table. Renko charts are used to filter the signal from the noise in volatile stock movements. 
 
 ## Installation
 
